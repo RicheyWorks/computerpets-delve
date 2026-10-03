@@ -1,36 +1,40 @@
 # Delve
 
-**Dungeon Crawl Pets** — Send pets on automated timed expeditions for loot while they still live on the desktop.
+**Send your pet on an off-duty expedition.**
 
-Part of [ComputerPets](https://github.com/RicheyWorks/computerpets). Map: [computerpets-ecosystem](https://github.com/RicheyWorks/computerpets-ecosystem).
+A planned idle expedition service where a pet leaves the desktop for a timed trip and returns with loot or a care need.
 
-| | |
+**Stage: design scaffold.** This checkout contains a design document and a source placeholder. The experience below is planned; there is no runnable app or integrated service yet.
+
+[Status](#status) · [Planned experience](#planned-experience) · [Contributor quickstart](#contributor-quickstart) · [Game design](docs/DESIGN.md) · [Ecosystem map](https://github.com/RicheyWorks/computerpets-ecosystem)
+
+## Status
+
+| Available today | What you can inspect |
 | --- | --- |
-| Status | Design scaffold — loop and engine frozen |
-| License | MIT |
-| Tokens | Minigames never mint or burn. Tired overlay, not a dead lineage. |
-| First pet | [Meet Rui first](https://github.com/RicheyWorks/computerpets/blob/main/docs/START-HERE.md). This game is optional. |
+| [Game design](docs/DESIGN.md) | Intended behavior, boundaries, and planned dependencies. |
+| [Source placeholder](src/main/java/com/enterprisepet/delve/package-info.java) | Java package declaration; no Maven/Gradle build or application is checked in. |
+| [MIT license](LICENSE) | Licensing terms for the repository. |
 
-## The loop
+Gameplay, endpoints, integration arrows, and failure handling on this page describe implementation targets. No build/test harness, CI workflow, or product screenshots are included in this scaffold.
 
-You cannot watch Rui 24h. Delve is the off-duty dungeon: a pet leaves the overlay for N hours, returns with loot or a scratch. Overlay shows 'away on delve'.
+## Planned experience
 
-## Who plays
+- POST /v1/delve — pick pet + dungeon + duration.
+- Pet is not on the desktop until return.
+- Loot table keyed by species biome (panda ≠ reef).
+- Scratch = medicine care on return.
 
-Players who cannot watch the overlay 24h.
-
-## What it is not
-
-Not permadeath. Away-on-delve is a presence state.
-
-## Genre and engine
+### Planned technology
 
 - Genre: **Idle / text RPG**
 - Engine: **Spring Boot**
 - Stack: Java 21 · Spring Boot 3.3 · scheduler expeditions · PostgreSQL loot · Companion UI later
 - Default surface: `8095`
 
-## Architecture
+### Planned connections
+
+These arrows show intended dependencies, rather than working integrations.
 
 ```mermaid
 flowchart LR
@@ -39,72 +43,48 @@ flowchart LR
   delve -->|loot| ledger
 ```
 
-## How you play
+## Contributor quickstart
 
-1. POST /v1/delve — pick pet + dungeon + duration.
-2. Pet is not on the desktop until return.
-3. Loot table keyed by species biome (panda ≠ reef).
-4. Scratch = medicine care on return.
+With access to this private repository, Git and PowerShell are enough to review the scaffold:
 
-## First slice
+```powershell
+git clone https://github.com/RicheyWorks/computerpets-delve.git
+Set-Location computerpets-delve
+Get-Content docs/DESIGN.md
+Get-Content src/main/java/com/enterprisepet/delve/package-info.java
+```
 
-Build this and stop.
+Read [Game design](docs/DESIGN.md) before choosing implementation details. The commands above inspect the checked-in files; app installation, editor launch, and server startup become possible after a buildable project and entry point are added.
+
+### First implementation target
 
 **POST delve 1h for Rui, overlay shows away, return with loot or a scratch.**
 
 You know it works when: Crash mid-job: durable return. Double-send 409. Death of a line is not a loot outcome.
 
-## Environment
+Treat this as an acceptance target for a future implementation. Start with the documented slice, add the required project setup and focused tests, and update these instructions with commands that work from a fresh clone.
 
-JDK 21, `DATABASE_URL`
+## Design boundaries
 
-## Failure doctrine
+1. Minigames cannot mint or burn NFTs by themselves (Minter is the write path).
+2. Stats come from lived overlay care + Dojo caps, not cash shop.
+3. Species kits stay inside Lore. Illegal hybrids never spawn.
+4. Fail soft: the desktop overlay process is not this process.
+
+**Required failure behavior:**
 
 Server crash mid-delve → job is durable, pet returns on restart. Double-send → 409. Death of a line is not a loot outcome.
 
-Canon rules that never yield:
+## Ecosystem
 
-- 210 living kinds. No illegal hybrids.
-- Overlay pets can get tired, sick, or hide. Tokens are not burned by a minigame.
-- Desktop walk stays the main quest. Closing Delve must leave Rui walking.
+- [computerpets-visitation](https://github.com/RicheyWorks/computerpets-visitation) (away state)
+- [computerpets-ledger](https://github.com/RicheyWorks/computerpets-ledger)
+- [computerpets-quests](https://github.com/RicheyWorks/computerpets-quests)
+- [computerpets-companion](https://github.com/RicheyWorks/computerpets-companion)
+- [computerpets-forensics](https://github.com/RicheyWorks/computerpets-forensics) (stuck jobs)
 
-## Neighbors
-
-- computerpets-visitation (away state)
-- computerpets-ledger
-- computerpets-quests
-- computerpets-companion
-- computerpets-forensics (stuck jobs)
-
-## Layout
-
-```
-computerpets-delve/
-  README.md
-  LICENSE
-  docs/DESIGN.md
-  src/                implementation lands here
-```
-
-## Run (Windows)
-
-```powershell
-mvn -q -DskipTests package; java -jar target/delve-1.0.0-SNAPSHOT.jar
-```
-
-Meet Rui first via the [flagship start-here](https://github.com/RicheyWorks/computerpets/blob/main/docs/START-HERE.md). This game is optional.
-
-## Links
-
-- Flagship: [RicheyWorks/computerpets](https://github.com/RicheyWorks/computerpets)
-- This repo: [RicheyWorks/computerpets-delve](https://github.com/RicheyWorks/computerpets-delve)
-- Map: [RicheyWorks/computerpets-ecosystem](https://github.com/RicheyWorks/computerpets-ecosystem)
-- Design file: [docs/DESIGN.md](docs/DESIGN.md)
+Start with the [ComputerPets flagship](https://github.com/RicheyWorks/computerpets) for the desktop pet. This repository describes an optional extension; the [ecosystem map](https://github.com/RicheyWorks/computerpets-ecosystem) explains the broader plan.
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
----
-
-*Two hundred ten living kinds. Keep them so a line does not go quiet.*
